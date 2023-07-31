@@ -1,0 +1,56 @@
+stages:
+- name: Integration--initial pipeline
+  iiidevops: initial-pipeline
+  steps:
+  - envFrom:
+    - sourceKey: api-origin
+      sourceName: nexus
+      targetKey: api_origin
+    runScriptConfig:
+      image: iiiorg/iiidevops-cli:0.0.4
+      shellScript: curl --location -s --request POST ${api_origin}/rancher/delete_app
+        --form project_name=${CICD_GIT_REPO_NAME} --form branch_name=${CICD_GIT_BRANCH}
+        && curl --location -s --request POST ${api_origin}/project/issues_commit_by_name
+        --form project_name=${CICD_GIT_REPO_NAME} && count-src.pl
+- name: Deploy--DB(MS-SQL)
+  iiidevops: deployed-environments
+  steps:
+  - applyAppConfig:
+      answers:
+        db.gui: true
+        auth.saPassword: DevOps_123
+        image.tag: 2019-CU10-ubuntu-20.04
+        git.url: ${CICD_GIT_URL}
+        git.repoName: ${CICD_GIT_REPO_NAME}
+        git.branch: ${CICD_GIT_BRANCH}
+        git.commitID: ${CICD_GIT_COMMIT}
+      catalogTemplate: cattle-global-data:iii-dev-charts3-mssql-server
+      name: ${CICD_GIT_REPO_NAME}-${CICD_GIT_BRANCH}-db
+      targetNamespace: ${CICD_GIT_REPO_NAME}
+      version: 0.1.1
+  when:
+    branch:
+      include:
+      - master
+- name: Deploy--Wait DB deployment
+  iiidevops: deployed-environments
+  steps:
+  - env:
+      deploy_name: ${CICD_GIT_REPO_NAME}-${CICD_GIT_BRANCH}-db
+      max_wait: 128
+      namespace: ${CICD_GIT_REPO_NAME}
+    envFrom:
+    - sourceKey: API_TOKEN
+      sourceName: pipeline-api-key
+      targetKey: rancher_api_token
+    - sourceKey: rancher-url
+      sourceName: rancher
+      targetKey: rancher_url
+    runScriptConfig:
+      image: iiiorg/iiidevops-cli:0.0.4
+      shellScript: rancher login ${rancher_url} -t ${rancher_api_token} --skip-verify;
+        deploy-wait.pl
+  when:
+    branch:
+      include:
+      - master
