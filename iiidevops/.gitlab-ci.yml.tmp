@@ -7,10 +7,10 @@ stages:
 
 include:
   - project: 'iiidevops-templates/ci-template'
-    ref: 'v2.0.0'
+    ref: 'v2.1.1'
     file: 'ci/template.gitlab-ci.yml'
   - project: 'iiidevops-templates/ci-template'
-    ref: 'v2.0.0'
+    ref: 'v2.1.1'
     file: 'job/DeployDatabase-MS.gitlab-ci.yml'
 
 Deploy--Database (MS-SQL):
@@ -23,11 +23,11 @@ Deploy--Database (MS-SQL):
     CHART_NFS_SERVER_IP: "10.20.0.100"
     CHART_VERSION: "0.2.0"
   only:
-    - skip
+    - master
 
 Deploy--Wait DB deployment:
   variables:
     iiidevops: deployed-environments
     max_wait: 128
   only:
-    - skip
+    - master
