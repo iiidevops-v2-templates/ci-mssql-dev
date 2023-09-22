@@ -1,6 +1,6 @@
 {
   "name": "Microsoft SQL Server Linux 2019",
-  "description": "Microsoft SQL Server Linux 2019 密碼一定要大小寫英數!!! <a class='el-link el-link--primary' href='https://github.com/iiidevops-templates/mssql-server-dev/blob/master/README.md' target='_blank'>MS SQL Server 部署注意事項</a><hr /><ul><li><strong>v2.0</strong>:更新CI自動化腳本</li></ul>",
+  "description": "Microsoft SQL Server Linux 2019 密碼一定要大小寫英數!!! <a class='el-link el-link--primary' href='https://github.com/iiidevops-v2-templates//ci-mssql-dev/blob/master/README.md' target='_blank'>MS SQL Server 部署注意事項</a><hr /><ul><li><strong>v2.0</strong>:更新CI自動化腳本</li></ul>",
   "arguments": [
     {
       "key": "auth.saPassword",
