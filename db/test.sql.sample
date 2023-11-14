@@ -1,0 +1,44 @@
+USE [master]
+GO
+
+DECLARE @SQLDataFolder nvarchar(max) = cast(SERVERPROPERTY('InstanceDefaultDataPath') as nvarchar(max))
+DECLARE @SQLLogFolder nvarchar(max) = cast(SERVERPROPERTY('InstanceDefaultLogPath') as nvarchar(max))
+DECLARE @SQL nvarchar(max) = N'';
+
+SET @SQL = N'
+CREATE DATABASE [test]
+ CONTAINMENT = NONE
+ ON  PRIMARY
+    (NAME = N''test'', FILENAME = N''' + @SQLDataFolder + 'test.mdf'' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB ),
+ FILEGROUP [test_mod] CONTAINS MEMORY_OPTIMIZED_DATA  DEFAULT
+    (NAME = N''test_mod'', FILENAME = N''' + @SQLLogFolder + 'test_mod'' , MAXSIZE = UNLIMITED)
+ LOG ON
+    (NAME = N''test_log'', FILENAME = N''' + @SQLLogFolder + 'test_log.ldf'' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB );
+
+ALTER DATABASE [test] SET COMPATIBILITY_LEVEL = 130; ALTER DATABASE [test] SET MEMORY_OPTIMIZED_ELEVATE_TO_SNAPSHOT=ON;'
+
+EXECUTE (@SQL)
+GO
+
+USE [test]
+GO
+
+-- 如果 'Users' 表格不存在，則創建它
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Users')
+BEGIN
+    CREATE TABLE Users
+    (
+        UserId int IDENTITY (1,1) NOT NULL,
+        UserName NVARCHAR(50) NOT NULL,
+        StudentId NVARCHAR(20)
+        -- 其他欄位根據實際需要添加
+    );
+	
+	-- Now add the clustered index
+	ALTER TABLE Users
+		ADD CONSTRAINT PK_Users_UserID PRIMARY KEY CLUSTERED (UserID);
+
+    -- 插入一條使用者數據
+    INSERT INTO Users (UserName, StudentId)
+    VALUES ('John Doe', '123456');
+END;
