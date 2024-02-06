@@ -1,31 +1,28 @@
 stages:
-  - initial
-  - scan
-  - build
-  - deploy
-  - test
-
+- initial
+- scan
+- build
+- deploy
+- test
 include:
-  - project: 'iiidevops-templates/ci-template'
-    ref: 'v2.5.4'
-    file: 'ci/template.gitlab-ci.yml'
-  - project: 'iiidevops-templates/ci-template'
-    ref: 'v2.5.4'
-    file: 'job/DeployDatabase-MS.gitlab-ci.yml'
-
+- project: iiidevops-templates/ci-template
+  ref: v2.5.5
+  file: ci/template.gitlab-ci.yml
+- project: iiidevops-templates/ci-template
+  ref: v2.5.5
+  file: job/DeployDatabase-MS.gitlab-ci.yml
 Deploy--Database (MS-SQL):
   variables:
     iiidevops: deployed-environments
-    CHART_DB_GUI: "true"
-    CHART_DB_PASSWORD: "DevOps_123"
-    CHART_DB_TAG: "2019-CU10-ubuntu-20.04"
+    CHART_DB_GUI: 'true'
+    CHART_DB_PASSWORD: DevOps_123
+    CHART_DB_TAG: 2019-CU10-ubuntu-20.04
     CHART_VOLUME_ENABLED: 'false'
   only:
-    - master
-
+  - master
 Deploy--Wait DB deployment:
   variables:
     iiidevops: deployed-environments
     max_wait: 128
   only:
-    - master
+  - master
